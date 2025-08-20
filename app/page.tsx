@@ -1,6 +1,133 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
+function BeforeAfter({
+  beforeSrc,
+  afterSrc,
+  zoom = 1,
+}: {
+  beforeSrc: string;
+  afterSrc: string;
+  zoom?: number;
+}) {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [ratio, setRatio] = useState<number>(0.5); // 0..1
+
+  // キーボード左右で微調整できると便利（フォーカス時）
+  const rangeRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    const el = rangeRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.02 : 0.02;
+      setRatio((r) => Math.max(0, Math.min(1, r + delta)));
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  return (
+    <div
+      ref={wrapRef}
+      style={{
+        position: "relative",
+        display: "inline-block",
+        alignSelf: "start",
+        maxWidth: "100%",
+        overflow: "auto",
+        borderRadius: 12,
+        background: "rgba(0,0,0,0.2)",
+        border: "1px solid var(--card-border)",
+      }}
+    >
+      {/* Before（下層） */}
+      <img
+        src={beforeSrc}
+        alt="before"
+        style={{
+          display: "block",
+          transform: `scale(${zoom})`,
+          transformOrigin: "top left",
+          pointerEvents: "none",
+          userSelect: "none",
+        }}
+        draggable={false}
+      />
+
+      {/* After（上層をマスク表示：幅で切る） */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: `${ratio * 100}%`,
+          overflow: "hidden",
+          pointerEvents: "none",
+        }}
+        aria-hidden
+      >
+        <img
+          src={afterSrc}
+          alt="after"
+          style={{
+            display: "block",
+            transform: `scale(${zoom})`,
+            transformOrigin: "top left",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+          draggable={false}
+        />
+      </div>
+
+      {/* ハンドル（中央の縦線） */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          left: `${ratio * 100}%`,
+          width: 0,
+          borderLeft: "2px solid rgba(255,255,255,0.8)",
+          transform: "translateX(-1px)",
+          zIndex: 3,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* スライダーUI（アクセシブル&スマホ対応） */}
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 8,
+          display: "flex",
+          justifyContent: "center",
+          zIndex: 4,
+          pointerEvents: "auto",
+        }}
+      >
+        <input
+          ref={rangeRef}
+          type="range"
+          min={0}
+          max={100}
+          value={Math.round(ratio * 100)}
+          onChange={(e) => setRatio(Number(e.target.value) / 100)}
+          style={{
+            width: "60%",
+            appearance: "none",
+            height: 6,
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.35)",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
 
 export default function Page() {
   const [file, setFile] = useState<File | null>(null);
@@ -12,6 +139,9 @@ export default function Page() {
   const downloadAnchorRef = useRef<HTMLAnchorElement | null>(null);
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // プレビューズーム（100% / 200%）
+  const [zoom, setZoom] = useState<1 | 2>(1);
 
   const handleFile = (f: File | null) => {
     setFile(f);
@@ -57,6 +187,8 @@ export default function Page() {
 
   return (
     <>
+      {/* ★この大きな<style>はSSR差分でHydration Errorの原因になりやすいです。
+          将来は app/globals.css へ移すのをおすすめします（今はそのまま残して動かします）。 */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
         :root {
@@ -102,13 +234,6 @@ export default function Page() {
           align-items: center;
           gap: 10px;
         }
-        .badge {
-          font-size: 12px;
-          padding: 4px 8px;
-          border-radius: 999px;
-          background: linear-gradient(135deg, var(--accent), var(--accent2));
-          color: white;
-        }
         .grid {
           display: grid;
           grid-template-columns: 1fr;
@@ -150,28 +275,19 @@ export default function Page() {
           background: transparent; color: var(--text); border: 1px solid var(--card-border);
         }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .preview {
-          height: 360px; display: grid; place-items: center; overflow: hidden;
-          border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--card-border);
-        }
+        .preview { height: 360px; display: grid; place-items: center; overflow: hidden;
+          border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--card-border); }
         .preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .note { color: var(--muted); font-size: 12px; margin-top: 8px; }
         .footer { margin-top: 14px; display:flex; justify-content: space-between; align-items:center; font-size: 12px; color: var(--muted); }
-        .dot { width:8px; height:8px; border-radius:50%; background: var(--success); display:inline-block; margin-right:6px; }
-        .loader {
-          width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
-          border-top-color: white; border-radius: 50%; animation: spin 0.9s linear infinite; display:inline-block; vertical-align:-3px; margin-right:8px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
 
       <div className="wrap">
         <div className="card">
-          <div className="title">
-            画像ファイルアップスケール
-          </div>
+          <div className="title">画像ファイルアップスケール</div>
 
           <div className="grid" style={{ marginTop: 18 }}>
+            {/* 左：設定 */}
             <div className="panel">
               <label>画像ファイル</label>
               <input
@@ -186,7 +302,9 @@ export default function Page() {
                   <select
                     className="select"
                     value={dimType}
-                    onChange={(e) => setDimType(e.target.value as "width" | "height")}
+                    onChange={(e) =>
+                      setDimType(e.target.value as "width" | "height")
+                    }
                   >
                     <option value="width">幅を指定</option>
                     <option value="height">高さを指定</option>
@@ -210,7 +328,9 @@ export default function Page() {
                   <select
                     className="format"
                     value={outFormat}
-                    onChange={(e) => setOutFormat(e.target.value as "png" | "webp")}
+                    onChange={(e) =>
+                      setOutFormat(e.target.value as "png" | "webp")
+                    }
                   >
                     <option value="png">PNG（透過保持）</option>
                     <option value="webp">WebP（軽量）</option>
@@ -219,33 +339,119 @@ export default function Page() {
               </div>
 
               <div className="btns">
-                <button className="primary" onClick={handleUpscale} disabled={!file || loading}>
-                  {loading ? <><span className="loader"></span>処理中…</> : "アップスケール開始"}
+                <button
+                  className="primary"
+                  onClick={handleUpscale}
+                  disabled={!file || loading}
+                >
+                  {loading ? (
+                    <>
+                      <span
+                        style={{
+                          width: 18,
+                          height: 18,
+                          border: "2px solid rgba(255,255,255,0.3)",
+                          borderTopColor: "white",
+                          borderRadius: "50%",
+                          display: "inline-block",
+                          marginRight: 8,
+                          verticalAlign: -3,
+                          animation: "spin 0.9s linear infinite",
+                        }}
+                      />
+                      処理中…
+                    </>
+                  ) : (
+                    "アップスケール開始"
+                  )}
                 </button>
                 <a
                   ref={downloadAnchorRef}
                   href={downloadUrl ?? "#"}
-                  download={outFormat === "webp" ? "upscaled.webp" : "upscaled.png"}
+                  download={
+                    outFormat === "webp" ? "upscaled.webp" : "upscaled.png"
+                  }
                 >
                   <button className="ghost" disabled={!downloadUrl}>
                     ダウンロード
                   </button>
                 </a>
               </div>
-              <div className="note">※ 完了後にダウンロードボタンが有効になります</div>
+              <div className="note">
+                ※ 完了後にダウンロードボタンが有効になります
+              </div>
             </div>
 
+            {/* 右：プレビュー／比較 */}
             <div className="panel">
-              <label>プレビュー</label>
-              <div className="preview">
-                {previewUrl ? (
-                  <img src={previewUrl} alt="preview" />
-                ) : (
-                  <div style={{ opacity: 0.7 }}>画像を選択するとプレビューが表示されます</div>
-                )}
-              </div>
+              <label style={{ display: "flex", justifyContent: "space-between" }}>
+                <span>プレビュー</span>
+                <span style={{ display: "inline-flex", gap: 8 }}>
+                  <button
+                    type="button"
+                    onClick={() => setZoom(1)}
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: 8,
+                      border: "1px solid var(--card-border)",
+                      background: zoom === 1 ? "rgba(255,255,255,0.15)" : "transparent",
+                      color: "var(--text)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    100%
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setZoom(2)}
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: 8,
+                      border: "1px solid var(--card-border)",
+                      background: zoom === 2 ? "rgba(255,255,255,0.15)" : "transparent",
+                      color: "var(--text)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    200%
+                  </button>
+                </span>
+              </label>
+
+              {!downloadUrl ? (
+                <div className="preview" style={{ overflow: "auto" }}>
+                  {previewUrl ? (
+                    <img
+                      src={previewUrl}
+                      alt="preview"
+                      style={{
+                        transform: `scale(${zoom})`,
+                        transformOrigin: "top left",
+                        maxWidth: "none",
+                        maxHeight: "none",
+                        display: "block",
+                      }}
+                      draggable={false}
+                    />
+                  ) : (
+                    <div style={{ opacity: 0.7 }}>
+                      画像を選択するとプレビューが表示されます
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="preview" style={{ overflow: "visible" }}>
+                  <BeforeAfter
+                    beforeSrc={previewUrl!}
+                    afterSrc={downloadUrl!}
+                    zoom={zoom}
+                  />
+                </div>
+              )}
+
               <div className="footer">
                 <div>比率は自動で維持されます</div>
+                <div>ズームは100%/200%、下部スライダーで比較</div>
               </div>
             </div>
           </div>
