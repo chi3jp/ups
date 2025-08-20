@@ -1,0 +1,91 @@
+/* === Zoom & Preview === */
+.preview.scrollable {
+  overflow: auto;
+  height: 360px;
+  display: grid;
+  place-items: stretch;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--card-border);
+}
+
+.preview.scrollable img {
+  max-width: none; /* ズーム時に拡大表示するため */
+  max-height: none;
+  display: block;
+}
+
+.zoom-controls {
+  display: inline-flex;
+  gap: 8px;
+}
+.zoom-btn {
+  appearance: none;
+  border: 1px solid var(--card-border);
+  background: rgba(0,0,0,0.2);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.zoom-btn.active {
+  outline: 2px solid rgba(139,92,246,0.6);
+}
+
+/* === Before/After Slider === */
+.ba-container {
+  position: relative;
+  display: inline-block;
+  align-self: start;
+  width: max-content;
+  height: max-content;
+}
+
+.ba-img {
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ba-after-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0; /* 後述で高さを合わせる */
+}
+
+/* 画像の実寸に合わせてマスクの高さを自動にするトリック */
+.ba-container > img.ba-img {
+  position: relative;
+  z-index: 0;
+}
+.ba-container > .ba-after-mask {
+  height: 100%;
+}
+
+/* ハンドル */
+.ba-handle {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  height: 100%;
+  display: grid;
+  place-items: center;
+  cursor: ew-resize;
+  z-index: 3;
+}
+.ba-handle-line {
+  width: 2px;
+  height: 100%;
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0 0 8px rgba(0,0,0,0.4);
+}
+.ba-handle-dot {
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.5);
+  margin-top: -50%;
+}
