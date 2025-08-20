@@ -168,8 +168,7 @@ export default function Page() {
       <div className="wrap">
         <div className="card">
           <div className="title">
-            アスペクト比維持アップスケール
-            <span className="badge">Non‑AI / Lanczos3</span>
+            画像ファイルアップスケール
           </div>
 
           <div className="grid" style={{ marginTop: 18 }}>
@@ -246,7 +245,6 @@ export default function Page() {
                 )}
               </div>
               <div className="footer">
-                <div><span className="dot"></span>サーバ処理（Sharp / Lanczos3）</div>
                 <div>比率は自動で維持されます</div>
               </div>
             </div>
