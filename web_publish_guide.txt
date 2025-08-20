@@ -1,0 +1,44 @@
+【Web公開（デプロイ）手順 / Next.js + Vercel】
+
+■ 前提
+- このフォルダをそのまま使います（`my-upscale-app/`）
+- Node.js 18 以上推奨
+
+────────────────────────────────
+
+[方法A] GitHub 経由（推奨）
+1) GitHubに空のリポジトリを作成（例: my-upscale-app）
+2) ローカルで以下を実行
+   cd my-upscale-app
+   git init
+   git add .
+   git commit -m "init"
+   git branch -M main
+   git remote add origin <YOUR_REPO_URL>
+   git push -u origin main
+3) Vercel ダッシュボードにログイン → New Project → 上記リポジトリを選択 → Deploy
+   - 追加設定不要（Sharpは Node.js ランタイムで動作）
+4) 数分で本番URLが発行されます
+
+[方法B] Vercel CLI（最速）
+1) ローカル確認
+   npm install
+   npm run dev   # http://localhost:3000
+2) デプロイ
+   npm i -g vercel
+   vercel login
+   vercel        # プレビューURL
+   vercel --prod # 本番URL
+
+────────────────────────────────
+
+■ スマホ対応
+- ブラウザから写真選択 → サーバでアップスケール → 完了後にDLボタン有効化
+- 大容量画像が多い場合は「Vercel Blob」を使う拡張をご検討ください
+
+■ よくあるエラー
+- 画像が大きすぎる → まずは5MB以下で検証
+- Edge Runtime で動かない → 本プロジェクトは Node.js Runtime を使用（route.ts内で指定済み）
+- 依存が入らない → `npm cache clean --force` 後に再インストール
+
+以上

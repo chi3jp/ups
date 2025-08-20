@@ -1,0 +1,33 @@
+【Web公開方法（Vercel利用）】
+
+1. GitHubにアップロード
+------------------------------------
+1) my-upscale-app.zip を展開してフォルダに入る
+   cd my-upscale-app
+
+2) Git初期化してGitHubへプッシュ
+   git init
+   git add .
+   git commit -m "init"
+   git branch -M main
+   git remote add origin <YOUR_REPO_URL>
+   git push -u origin main
+
+3) Vercelダッシュボードで New Project → リポジトリ選択 → Deploy
+
+2. Vercel CLIで直接デプロイ
+------------------------------------
+1) ローカルで確認
+   npm install
+   npm run dev   # http://localhost:3000
+
+2) デプロイ
+   npm i -g vercel
+   vercel login
+   vercel
+   vercel --prod
+
+※ メモ
+- APIランタイムは Node.js（Edge不可）
+- 画像サイズが大きすぎるとエラーになる場合あり
+- その場合は Vercel Blob に拡張してください
