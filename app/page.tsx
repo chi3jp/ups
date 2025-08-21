@@ -10,7 +10,6 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const downloadAnchorRef = useRef<HTMLAnchorElement | null>(null);
-
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleFile = (f: File | null) => {
@@ -151,54 +150,26 @@ export default function Page() {
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
- /* ===== Newsletter CTA ===== */
-.newsletter {
-  margin-top: 22px;
-  padding: 20px;
-  text-align: center;
-}
-
-.newsletter-text {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text);
-}
-
-.newsletter-note {
-  margin: 10px 0 0 0;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.newsletter-btn {
-  display: inline-block;
-  margin-top: 16px;
-  padding: 12px 20px;
-  border-radius: 9999px;
-  font-weight: 600;
-  font-size: 14px;
-  text-align: center;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #fff;
-  text-decoration: none;
-  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
-  transition: transform 0.15s ease, opacity 0.15s ease;
-}
-.newsletter-btn:hover {
-  transform: translateY(-2px);
-  opacity: 0.9;
-}
-</style>
-
+  /* ===== Newsletter CTA ===== */
+  .newsletter { margin-top: 22px; padding: 20px; text-align: center; }
+  .newsletter-text { margin: 0 0 12px; font-size: 14px; line-height: 1.7; color: var(--text); }
+  .newsletter-note { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+  .newsletter-btn {
+    display: inline-block; margin-top: 16px; padding: 12px 20px; border-radius: 9999px;
+    font-weight: 600; font-size: 14px; text-align: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; text-decoration: none; box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
+    transition: transform .15s ease, opacity .15s ease;
+  }
+  .newsletter-btn:hover { transform: translateY(-2px); opacity: .9; }
+      `}</style>
 
       <div className="wrap">
         <div className="card">
-          <div className="title">
-            画像ファイルアップスケール
-          </div>
+          <div className="title">画像ファイルアップスケール</div>
 
           <div className="grid" style={{ marginTop: 18 }}>
+            {/* 左パネル */}
             <div className="panel">
               <label>画像ファイル</label>
               <input
@@ -259,9 +230,11 @@ export default function Page() {
                   </button>
                 </a>
               </div>
+
               <div className="note">※ 完了後にダウンロードボタンが有効になります</div>
             </div>
 
+            {/* 右パネル */}
             <div className="panel">
               <label>プレビュー</label>
               <div className="preview">
@@ -276,33 +249,32 @@ export default function Page() {
               </div>
             </div>
           </div>
+
           {/* --- Newsletter CTA (Footer) --- */}
-<div className="newsletter">
-  <p className="newsletter-text">
-    アップデート情報やAI活用のヒントをお届けする<strong>無料メルマガ</strong>を配信中！<br />
-    ご登録で <strong>ChatGPTプロンプト集</strong> や <strong>Midjourneyで使えるChrome拡張</strong> をプレゼント中。
-  </p>
-{/* 登録URLに差し替え */}
- <a
-  className="newsletter-btn"
-  href="https://chi3.substack.com/about"
-  target="_blank"
-  rel="noopener noreferrer"
-  onClick={() => {
-    if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
-      (window as any).gtag("event", "newsletter_click", {
-        event_category: "engagement",
-        event_label: "footer_cta",
-      });
-    }
-  }}
->
-  📩 特典詳細確認・メルマガ無料登録する
-</a>
-
-  <p className="newsletter-note">※ いつでも1クリックで解除できます</p>
-</div>
-
+          <div className="newsletter">
+            <p className="newsletter-text">
+              アップデート情報やAI活用のヒントをお届けする<strong>無料メルマガ</strong>を配信中！<br />
+              ご登録で <strong>ChatGPTプロンプト集</strong> や <strong>Midjourneyで使えるChrome拡張</strong> をプレゼント中。
+            </p>
+            {/* 登録URLに差し替え */}
+            <a
+              className="newsletter-btn"
+              href="https://chi3.substack.com/about"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => {
+                if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
+                  (window as any).gtag("event", "newsletter_click", {
+                    event_category: "engagement",
+                    event_label: "footer_cta",
+                  });
+                }
+              }}
+            >
+              📩 特典詳細確認・メルマガ無料登録する
+            </a>
+            <p className="newsletter-note">※ いつでも1クリックで解除できます</p>
+          </div>
         </div>
       </div>
     </>
