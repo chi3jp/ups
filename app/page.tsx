@@ -151,41 +151,45 @@ export default function Page() {
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ===== Newsletter CTA ===== */
-  .newsletter {
-    margin-top: 22px;
-    padding: 20px;
-    border: 1px solid var(--card-border);
-    border-radius: 14px;
-    background: rgba(255,255,255,0.05);
-    text-align: center;
-  }
-  .newsletter-text {
-    margin: 0 0 12px 0;
-    font-size: 14px;
-    line-height: 1.7;
-  }
-  .newsletter-note {
-    margin: 10px 0 0 0;
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .newsletter-btn {
-    display: inline-block;
-    margin-top: 16px;
-    padding: 12px 20px;
-    border-radius: 9999px;
-    font-weight: 600;
-    font-size: 14px;
-    text-align: center;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff;
-    text-decoration: none;
-    box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
-    transition: transform 0.15s ease, opacity 0.15s ease;
-  }
-  .newsletter-btn:hover { transform: translateY(-2px); opacity: 0.9; }
-`}</style>
+ /* ===== Newsletter CTA ===== */
+.newsletter {
+  margin-top: 22px;
+  padding: 20px;
+  text-align: center;
+}
+
+.newsletter-text {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.newsletter-note {
+  margin: 10px 0 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.newsletter-btn {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 12px 20px;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.newsletter-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+</style>
 
 
       <div className="wrap">
@@ -281,7 +285,7 @@ export default function Page() {
 {/* 登録URLに差し替え */}
  <a
   className="newsletter-btn"
-  href="https://chi3.substack.com/about"  // ← ここは実URLに差し替え
+  href="https://chi3.substack.com/about"
   target="_blank"
   rel="noopener noreferrer"
   onClick={() => {
