@@ -249,6 +249,23 @@ export default function Page() {
               </div>
             </div>
           </div>
+          {/* --- Newsletter CTA (Footer) --- */}
+<div className="newsletter">
+  <p className="newsletter-text">
+    アップデート情報やAI活用のヒントをお届けする<strong>無料メルマガ</strong>を配信中！<br />
+    ご登録で <strong>ChatGPTプロンプト集</strong> や <strong>Midjourneyで使えるChrome拡張</strong> をプレゼント中。
+  </p>
+  <a
+    className="nl-btn"
+    href="https://example.com/newsletter"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    こちらから無料登録
+  </a>
+  <p className="newsletter-note">※ いつでも1クリックで解除できます</p>
+</div>
+
         </div>
       </div>
     </>
