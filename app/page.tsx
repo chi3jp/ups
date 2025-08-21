@@ -293,7 +293,7 @@ export default function Page() {
     }
   }}
 >
-  📩 メルマガに無料登録する
+  📩 特典詳細確認・メルマガ無料登録する
 </a>
 
   <p className="newsletter-note">※ いつでも1クリックで解除できます</p>
