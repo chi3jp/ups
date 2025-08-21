@@ -150,19 +150,46 @@ export default function Page() {
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ===== Newsletter CTA ===== */
-  .newsletter { margin-top: 22px; padding: 20px; text-align: center; }
-  .newsletter-text { margin: 0 0 12px; font-size: 14px; line-height: 1.7; color: var(--text); }
-  .newsletter-note { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+  /* === Newsletter（パネルと統一の背景） === */
+  .newsletter {
+    margin-top: 30px;
+    padding: 20px;
+    text-align: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+  }
+  .newsletter-text {
+    margin: 0 0 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  .newsletter-note {
+    margin: 10px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+  }
   .newsletter-btn {
-    display: inline-block; margin-top: 16px; padding: 12px 20px; border-radius: 9999px;
-    font-weight: 600; font-size: 14px; text-align: center;
+    display: inline-block;
+    margin-top: 16px;
+    padding: 12px 20px;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: #fff; text-decoration: none; box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35);
     transition: transform .15s ease, opacity .15s ease;
   }
-  .newsletter-btn:hover { transform: translateY(-2px); opacity: .9; }
-      `}</style>
+  .newsletter-btn:hover {
+    transform: translateY(-2px);
+    opacity: .9;
+  }
+`}</style>
+
 
       <div className="wrap">
         <div className="card">
