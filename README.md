@@ -12,22 +12,7 @@ npm run dev
 # http://localhost:3000
 ```
 
-## 2) デプロイ（Vercel）
-### A. GitHub経由（推奨）
-1. このフォルダを新規リポジトリにpush  
-2. Vercelのダッシュボード → **New Project** → 対象リポジトリを選択  
-3. Framework = Next.js（自動認識）→ **Deploy**  
-   - 追加設定不要（`app/api/upscale/route.ts` 内の `export const runtime = "nodejs"` によりSharpが動作）
-
-### B. Vercel CLI経由
-```bash
-npm i -g vercel
-vercel login
-vercel        # プレビュー
-vercel --prod # 本番デプロイ
-```
-
-## 3) 使い方
+## 2) 使い方
 1. 画像を選択
 2. 基準を「幅」または「高さ」に切替、値(px)を入力
 3. 「アップスケール開始」を押す
@@ -36,5 +21,4 @@ vercel --prod # 本番デプロイ
 ## 注意
 - 非AIの補間のため「完全無劣化」ではありませんが、非AIでは高品質な部類です
 - 大きすぎる拡大はぼけが目立つことがあります（長辺8K以内を推奨）
-# ups
-# ups
+
