@@ -255,14 +255,22 @@ export default function Page() {
     アップデート情報やAI活用のヒントをお届けする<strong>無料メルマガ</strong>を配信中！<br />
     ご登録で <strong>ChatGPTプロンプト集</strong> や <strong>Midjourneyで使えるChrome拡張</strong> をプレゼント中。
   </p>
-  <a
-    className="nl-btn"
-    href="https://example.com/newsletter"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    こちらから無料登録
-  </a>
+ <a
+  className="newsletter-btn"
+  href="https://example.com/newsletter"  // ← 登録ページのURLに差し替え
+  target="_blank"
+  rel="noopener noreferrer"
+  onClick={() => {
+    if (typeof window !== "undefined" && typeof (window as any).gtag === "function") {
+      (window as any).gtag("event", "newsletter_click", {
+        event_category: "engagement",
+        event_label: "footer_cta",
+      });
+    }
+  }}
+>
+  📩 メルマガに無料登録する
+</a>
   <p className="newsletter-note">※ いつでも1クリックで解除できます</p>
 </div>
 
