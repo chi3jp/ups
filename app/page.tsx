@@ -1,8 +1,9 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useRef } from "react";
 
-export default function Page() {
+function PageInner() {
   const [file, setFile] = useState<File | null>(null);
   const [dimType, setDimType] = useState<"width" | "height">("width");
   const [dimValue, setDimValue] = useState<number>(2048);
@@ -12,21 +13,57 @@ export default function Page() {
   const downloadAnchorRef = useRef<HTMLAnchorElement | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const handleFile = (f: File | null) => {
-    setFile(f);
+  // 検証用のステータス（ランプ/メッセージ表示用）
+  const [fileStatus, setFileStatus] = useState<"idle" | "ok" | "error">("idle");
+  const [fileMessage, setFileMessage] = useState<string>("");
+  const [dimStatus, setDimStatus] = useState<"idle" | "ok" | "error">("ok");
+  const [dimMessage, setDimMessage] = useState<string>("");
+
+  // 制限: アップロード 4MB、出力の長辺 最大 5000px
+  const MAX_FILE_BYTES = 4 * 1024 * 1024; // 4MB
+  const MAX_OUTPUT_PX = 5000; // px
+
+  const handleFile = async (f: File | null) => {
     setDownloadUrl(null);
-    if (f) {
-      const url = URL.createObjectURL(f);
-      setPreviewUrl(url);
-    } else {
+    if (!f) {
+      setFile(null);
       setPreviewUrl(null);
+      setFileStatus("idle");
+      setFileMessage("");
+      return;
     }
+
+    // サイズチェック（Vercelのサーバレス上限を考慮して4MB）
+    if (f.size > MAX_FILE_BYTES) {
+      alert("ファイルサイズが大きすぎます。4MB以内の画像を選択してください。");
+      setFile(null);
+      setPreviewUrl(null);
+      setFileStatus("error");
+      setFileMessage("4MBを超えています。4MB以内の画像を選択してください。");
+      return;
+    }
+
+    // OK: 受け入れ
+    setFile(f);
+    const url = URL.createObjectURL(f);
+    setPreviewUrl(url);
+    setFileStatus("ok");
+    setFileMessage("");
   };
 
   async function handleUpscale() {
     if (!file) return;
     if (!dimValue || dimValue <= 0) {
       alert("幅または高さに正の数値を入力してください");
+      return;
+    }
+    // 出力側の上限チェック
+    if (dimValue > MAX_OUTPUT_PX) {
+      alert(`出力サイズが大きすぎます。${MAX_OUTPUT_PX}px 以下を指定してください。`);
+      return;
+    }
+    if (fileStatus === "error" || dimStatus === "error") {
+      alert("入力に不備があります。赤ランプの項目を修正してください。");
       return;
     }
     setLoading(true);
@@ -57,7 +94,7 @@ export default function Page() {
   return (
     <>
       <style>{`
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@600;700&display=swap');
   :root {
     --bg1: #0f1226;
     --bg2: #1e1b4b;
@@ -95,11 +132,28 @@ export default function Page() {
   }
   .title {
     font-weight: 800;
-    font-size: 28px;
+    font-size: clamp(20px, 5.2vw, 28px); /* 画面幅に応じて縮小して1行維持 */
     letter-spacing: 0.2px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: clamp(6px, 2vw, 10px);
+    white-space: nowrap;       /* 1行に固定 */
+    font-family: Poppins, Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+  }
+  .title-text { flex: 0 1 auto; min-width: 0; }
+  .title-version {
+    flex: 0 0 auto;
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+    font-weight: 600;
+    font-size: 11px;
+    color: #c7d2fe;
+    background: rgba(139,92,246,0.18);
+    border: 1px solid rgba(139,92,246,0.35);
+    padding: 2px 8px;
+    border-radius: 9999px;
+  }
+  @media (max-width: 360px) {
+    .title-version { font-size: 10px; padding: 1px 6px; }
   }
   .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
   @media (min-width: 860px) { .grid { grid-template-columns: 1.2fr 1fr; } }
@@ -150,6 +204,15 @@ export default function Page() {
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  /* inline hint */
+  .hint { color: var(--muted); font-size: 12px; margin-left: 6px; }
+
+  /* === Validation status === */
+  .status { display:flex; align-items:center; gap:8px; font-size:12px; margin-top:6px; color: var(--muted); }
+  .lamp { width:10px; height:10px; border-radius:50%; background: rgba(255,255,255,0.25); border: 1px solid var(--card-border); }
+  .lamp.ok { background: var(--success); border-color: rgba(16,185,129,0.6); }
+  .lamp.err { background: #ef4444; border-color: rgba(239,68,68,0.7); }
+
   /* === Newsletter（パネルと統一の背景） === */
   .newsletter {
     margin-top: 30px;
@@ -193,17 +256,31 @@ export default function Page() {
 
       <div className="wrap">
         <div className="card">
-          <div className="title">画像ファイルアップスケール</div>
+          <div className="title">
+            <span className="title-text">画像ファイルアップスケール</span>
+            <span className="title-version">v1.1.0</span>
+          </div>
 
           <div className="grid" style={{ marginTop: 18 }}>
             {/* 左パネル */}
             <div className="panel">
-              <label>画像ファイル</label>
+              <label>
+                画像ファイル <span className="hint">（4MB以内）</span>
+              </label>
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+                onChange={(e) => {
+                  void handleFile(e.target.files?.[0] ?? null);
+                }}
               />
+              <div className="status">
+                <span className={`lamp ${fileStatus === "ok" ? "ok" : fileStatus === "error" ? "err" : ""}`}></span>
+                <span>
+                  {fileStatus === "error" ? fileMessage : fileStatus === "ok" ? "OK" : "未選択"}
+                </span>
+              </div>
+              
 
               <div className="row" style={{ marginTop: 12 }}>
                 <div>
@@ -218,14 +295,37 @@ export default function Page() {
                   </select>
                 </div>
                 <div>
-                  <label>{dimType === "width" ? "幅(px)" : "高さ(px)"}</label>
+                  <label>
+                    {dimType === "width" ? "幅(px)" : "高さ(px)"}
+                    <span className="hint">（5000px以下）</span>
+                  </label>
                   <input
                     className="number"
                     type="number"
                     min={1}
+                    max={MAX_OUTPUT_PX}
                     value={dimValue}
-                    onChange={(e) => setDimValue(Number(e.target.value))}
+                    onChange={(e) => {
+                      const v = Number(e.target.value);
+                      setDimValue(v);
+                      if (!Number.isFinite(v) || v <= 0) {
+                        setDimStatus("error");
+                        setDimMessage("正の数値を入力してください。");
+                      } else if (v > MAX_OUTPUT_PX) {
+                        setDimStatus("error");
+                        setDimMessage(`${MAX_OUTPUT_PX}px 以下にしてください。`);
+                      } else {
+                        setDimStatus("ok");
+                        setDimMessage("");
+                      }
+                    }}
                   />
+                  <div className="status">
+                    <span className={`lamp ${dimStatus === "ok" ? "ok" : dimStatus === "error" ? "err" : ""}`}></span>
+                    <span>
+                      {dimStatus === "error" ? dimMessage : dimStatus === "ok" ? "OK" : "未入力"}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -307,3 +407,5 @@ export default function Page() {
     </>
   );
 }
+
+export default dynamic(() => Promise.resolve(PageInner), { ssr: false });

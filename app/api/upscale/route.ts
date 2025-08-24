@@ -16,6 +16,9 @@ export async function POST(req: Request) {
   if (!Number.isFinite(dimValue) || dimValue <= 0) {
     return new Response("dimValue must be positive number", { status: 400 });
   }
+  if (dimValue > 5000) {
+    return new Response("dimValue must be <= 5000 (max output long side)", { status: 400 });
+  }
 
   const inputBuf = Buffer.from(await file.arrayBuffer());
   let pipeline = sharp(inputBuf, { failOnError: true }).rotate();
