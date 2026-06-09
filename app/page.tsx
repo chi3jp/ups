@@ -380,13 +380,13 @@ function PageInner() {
           {/* --- Newsletter CTA (Footer) --- */}
           <div className="newsletter">
             <p className="newsletter-text">
-              アップデート情報やAI活用のヒントをお届けする<strong>無料メルマガ</strong>を配信中！<br />
-              ご登録で <strong>ChatGPTプロンプト集</strong> や <strong>Midjourneyで使えるChrome拡張</strong> をプレゼント中。
+              AI活用のヒントをお届けする<strong>無料メルマガ</strong>を配信中！<br />
+              ご登録で無料プレゼント中。
             </p>
             {/* 登録URLに差し替え */}
             <a
               className="newsletter-btn"
-              href="https://chi3.substack.com/about"
+              href="https://chiii3.systeme.io/7af4ded7?ups"
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
